@@ -3,3 +3,9 @@ destination: docs
 template:
   bootstrap: 5
   bootswatch: zephyr
+
+articles:
+- title: Tier 4 workflows
+  contents:
+  - sharpchin_single_species
+  - rebs_multispecies
