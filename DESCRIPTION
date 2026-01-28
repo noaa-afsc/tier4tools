@@ -5,7 +5,7 @@ Version: 0.1.0
 Date: 2026-01-30
 Authors@R: c(
     person("Jane", "Sullivan", email = "jane.sullivan@noaa.gov", role = c("aut", "cre")),
-    person("Kristen", "Omori", email = "kristen.omori@noaa.gov", role = c("ctb"))
+    person("Kristen", "Omori", email = "kristen.omori@noaa.gov", role = c("aut"))
     )
 Description: Provides tools for computing fishing mortality–based spawning potential ratio (SPR) reference points for Tier 4 groundfish stock assessments used by the North Pacific Fishery Management Council. The package supports single-species and multispecies per-recruit analyses, sensitivity evaluation of key biological and fishery assumptions, and generation of report-ready graphics for stock assessments.
 Depends:
@@ -22,7 +22,7 @@ Suggests:
     roxygen2 (>= 7.0.0),
     knitr (>= 1.37),
     rmarkdown (>= 2.11),
-    pkgdown (>=2.0.0)
+    pkgdown (>= 2.0.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
