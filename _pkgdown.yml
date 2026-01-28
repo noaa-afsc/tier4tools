@@ -1,8 +1,0 @@
-url: https://noaa-afsc.github.io/tier4tools/
-destination: docs
-template:
-  bootstrap: 5
-  bootswatch: zephyr
-home:
-  sidebar:
-    html: pkgdown/sidebar.html
