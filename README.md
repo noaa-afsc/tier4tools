@@ -35,9 +35,11 @@ A typical Tier 4 analysis using `tier4tools` follows four main steps:
 
 Detailed examples are available in the package vignettes, including:
 
--  single-species Tier 4 workflows,
--  multispecies per-recruit analyses,
--  interpretation of age decomposition plots and sensitivity results
+- single-species Tier 4 workflows,
+
+- multispecies per-recruit analyses,
+
+- interpretation of age decomposition plots and sensitivity results
 
 ```
 browseVignettes("tier4tools")
