@@ -1,5 +1,6 @@
 ---
 title: "Multispecies Tier 4 workflow: Gulf of Alaska rougheye and blackspotted rockfish (RE/BS) complex"
+weight: 2
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Multispecies Tier 4 workflow: GOA RE/BS complex}

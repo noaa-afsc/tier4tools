@@ -1,5 +1,6 @@
 ---
 title: "Single species workflow: Gulf of Alaska sharpchin rockfish"
+weight: 1
 output:
   rmarkdown::html_vignette
 vignette: >
