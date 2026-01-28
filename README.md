@@ -1,4 +1,4 @@
-# tier4tools <img src="man/figures/logo.png" align="right" width="200"/>
+# tier4tools
 
 ### Tier 4 Spawning Potential Ratio (SPR) reference points in Alaska groundfish stock assessments
 
@@ -29,7 +29,7 @@ A typical Tier 4 analysis using `tier4tools` follows four main steps:
 
 1.  Define biological and fishery inputs using `spr_input()`. Visualize and validate inputs using `plot_spr_inputs()`.
 
-2.  Compute per-recruit objects and SPR-based reference points (e.g., $F_{40\%}$, $F_{35\%}$) using `run_spr()`. Visualize results with `plot_spr_curves()`.
+2.  Compute per-recruit objects and SPR-based reference points (e.g., F40%, F35%) using `run_spr()`. Visualize results with `plot_spr_curves()`.
 
 3.  Show age decomposition and plus group diagnostics for spawning biomass per recruit (SBPR) contributions, removals, and survivorship using `plot_spr_decomp()`.
 
