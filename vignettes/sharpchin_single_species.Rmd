@@ -1,0 +1,215 @@
+---
+title: "Single species workflow: Gulf of Alaska sharpchin rockfish"
+output:
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Single species workflow: Gulf of Alaska sharpchin rockfish}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Background and objectives
+
+Sharpchin rockfish (*Sebastes zacentrus*) in the Gulf of Alaska is caught as a non-target species and has limited age and fishery data. Sharpchin is currently the only Alaska groundfish species managed under a Tier 4 assessment framework, and provides a useful example of how spawning potential ratio (SPR) and yield-per-recruit (YPR) methods can be applied when age-structured models are not feasible.
+
+This vignette demonstrates the full Tier 4 per-recruit workflow implemented in **tier4tools** using Gulf of Alaska sharpchin rockfish as a single-species example. The objectives are to:
+
+-   Construct per-recruit inputs using published and assessment-derived life history information using `spr_inputs()`.
+-   Validate inputs visually using `plot_spr_inputs()`.
+-   Compute SPR-based fishing mortality reference points using `run_spr()`.
+-   Generate diagnostic decomposition plots for review and SAFE reporting using `plot_spr_decomp()`.
+-   Evaluate sensitivity of reference points to uncertainty in natural mortality ($M$) fishery selectivity using `spr_sensitivity()`.
+
+## Life history and fishery inputs
+
+Biological inputs for sharpchin rockfish were drawn from published studies and assessment documentation, including von Bertalanffy growth parameters, weight-length relationships derived from trawl survey data, maturity-at-age estimates, and $M$ estimated using the Hoenig (1983) method. Fishery selectivity is poorly informed due to limited sampling and is therefore assumed to follow a knife-edge pattern.
+
+For the base case, $M = 0.052$, maturity is parameterized using a logistic maturity curve with midpoint $A_{50} = 10.06$ years and slope parameter $\delta = 1.96$. Fishery selectivity is assumed to be knife-edge with full selection beginning at age $a_c = 10$ years. A maximum age of 58 years is assumed, and here we assume no plus group.
+
+## Construct per-recruit inputs with `spr_input()`
+
+```{r}
+library(tier4tools)
+
+ages <- 0:100
+
+inp <- spr_input(
+  ages = ages,
+  species = list(
+    Sharpchin = list(
+      len_at_age = list(type = "vb", Linf = 35.02, k = 0.122, t0 = -0.75),
+      wt_at_age = list(type = "wl", alpha = 1.19e-5, beta = 3.056),
+      maturity = list(type = "logistic", a50 = 10.06, delta = -1.96),
+      selectivity = list(type = "knife_edge", a_c = 10),
+      M = 0.059
+    )
+  ),
+  use_plus_group = FALSE
+)
+
+str(inp, max.level = 3)
+```
+
+## Validate assumptions visually with `plot_spr_inputs()`
+
+Before running SPR calculations, it is good practice to check that the implied schedules look reasonable. `plot_spr_inputs()` is designed for two use cases:
+
+-   user quality assurance, to verify maturity, selectivity, weight-at-age, and mortality schedules were parameterized and input correctly
+-   reporting, to document base case versus sensitivity assumptions, or differences among species
+
+```{r}
+inp_plots <- plot_spr_inputs(inp, panels = c("mat_selex", "wt", "len", "M"))
+
+## inidividual plots
+# inp_plots$mat_selex
+# inp_plots$wt
+# inp_plots$len
+# inp_plots$M
+
+# select a group of plots using optional helper function that relies on
+# the "patchwork" R library
+grid_spr_inputs(inp_plots, order = c("mat_selex", "wt","len","M"), ncol = 2, guides = "keep")
+
+```
+
+If you are comparing scenarios, you can pass multiple `spr_input()` objects via `compare` and facet by scenario:
+
+```{r, eval=FALSE}
+# Example: requires you to construct additional spr_input objects, which
+# can be done by creating new input objects from scratch or by modifying
+# existing input objects as shown below
+# inp_sens1 <- inp
+# inp_sens1$species$Sharpchin$selex_at_age <- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 8))
+# inp_sens2 <- inp
+# inp_sens2$species$Sharpchin$selex_at_age <- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 12))
+# inp_plots <- plot_spr_inputs(x = inp, compare = list(Sens1 = inp_sens1, Sens2 = inp_sens2), )
+# inp_plots$mat_selex
+```
+
+## Run per-recruit SPR and YPR with `run_spr()`
+
+```{r}
+spr_out <- run_spr(
+  inp,
+  diagnostics = TRUE
+)
+
+spr_out$F_spr_total
+```
+
+## Plot SPR curves
+
+```{r}
+plot_spr_curves(spr_out)
+```
+
+The curve shows $SPR(F) = SBPR(F) / SBPR(0)$ across the fishing mortality grid. Horizontal lines show the target SPR levels (for example 0.40 and 0.35). The corresponding fishing mortality reference points (for example $F_{40\%}$ and $F_{35\%}$) are the values of $F$ where the curve intersects the targets.
+
+## Diagnostic decomposition plots
+
+Tier 4 SPR calculations can be sensitive to maturity schedules, selectivity assumptions, weight-at-age, and plus group treatment. To support consistent review and reporting, **tier4tools** provides SBPR age decomposition diagnostics as a set of standardized panels.
+
+```{r}
+plots <- plot_spr_decomp(spr_out,
+                         which_panels = c("contrib", "removed", "survivorship"),
+                         drop_plus_from_plot = TRUE)
+
+## individual plots
+# plots$contrib
+# plots$removed
+# plots$survivorship
+
+# select a group of plots using optional helper function that relies on
+# the "patchwork" R library
+grid_spr_decomp(plots)
+```
+
+**Interpretation:**
+
+-   `plots$contrib` shows SBPR contribution by age for unfished conditions (F = 0) and at the diagnostic reference fishing mortality (`Ftarget`).
+-   `plots$removed` shows the age-specific SBPR removed by fishing, computed as contribution at F = 0 minus contribution at `Ftarget`.
+-   `plots$survivorship` shows per-recruit survivorship under F = 0 and `Ftarget`.
+
+The plus group share is reported separately as the fraction of total SBPR contributed by the terminal age at F = 0 and `Ftarget`. Here we assume no plus group calculations in the model; therefore, the plus-share is almost non-existent.
+
+```{r}
+spr_out$diagnostics$plus_share
+```
+
+## Sensitivity analysis: natural mortality $M$ and selectivity
+
+Uncertainty in $M$ and fishery selectivity is a key concern for sharpchin rockfish. Here we run a structured sensitivity analysis varying:
+
+-   $M$ from 0.05 to 0.12
+-   knife-edge selectivity age $a_c$ from 5 to 15 years
+
+All other inputs are held fixed.
+
+```{r}
+sens <- spr_sensitivity(
+  inp,
+  M = seq(0.05, 0.12, by = 0.01),
+  selex_ac = seq(5, 15, by = 1),
+  spr_targets = c(0.40, 0.35),
+  multispecies_constraint = "none"
+)
+
+head(sens)
+```
+
+## Visualize sensitivity results
+
+Heatmaps are a compact way to summarize how reference points vary across a structured grid of assumptions.
+
+```{r}
+plot_sensitivity_heatmap(
+  sens,
+  x = "selex_ac",
+  y = "M",
+  fill = "F40_total",
+  title = "Sensitivity of F40 to M and selectivity assumptions",
+  fill_scale = "viridis"
+)
+```
+
+You can similarly visualize $F_{35}$ or yield at $F_{40}$.
+
+```{r}
+plot_sensitivity_heatmap(
+  sens,
+  x = "selex_ac",
+  y = "M",
+  fill = "F35_total",
+  title = "Sensitivity of F35 to natural mortality and selectivity assumptions"
+)
+
+plot_sensitivity_heatmap(
+  sens,
+  x = "selex_ac",
+  y = "M",
+  fill = "YPR_at_F40",
+  title = "Sensitivity of YPR at F40 to natural mortality and selectivity assumptions"
+)
+```
+
+
+**Interpretation:**
+
+-   Fishery selectivity and $M$ are both dominant sources of uncertainty in SPR-based reference points, with later age at full selection and higher $M$ resulting in higher $F_{40\%}$ and $F_{35\%}$.
+-   At low $M$ values, including the base-case M=0.059, and early selectivity, $F_{40\%}$ was uniformly low and relatively insensitive to either parameter. In contrast, at higher $M$ and later selectivity, small changes in either assumption produced large shifts in $F_{40\%}$. 
+-   YPR evaluated at $F_{40\%}$ increases with later selectivity and decreases with higher $M$, reflecting differences in the SPR-constrained $F$ rather than YPR at a fixed $F$.
+
+## Summary
+
+This vignette demonstrates a complete Tier 4 per-recruit workflow for a single species using **tier4tools**. The workflow separates biological and fishery assumptions from downstream calculations, provides standardized diagnostics and plotting helpers, and supports structured sensitivity evaluation of influential uncertainties.
+
+In the multispecies vignette, the same workflow is extended to stock complexes and additional outputs are introduced for constrained reference points.
