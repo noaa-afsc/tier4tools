@@ -1,4 +1,4 @@
-# tier4tools ![](reference/figures/logo.png)
+# tier4tools
 
 ### Tier 4 Spawning Potential Ratio (SPR) reference points in Alaska groundfish stock assessments
 
@@ -39,7 +39,7 @@ A typical Tier 4 analysis using `tier4tools` follows four main steps:
     [`plot_spr_inputs()`](https://noaa-afsc.github.io/tier4tools/reference/plot_spr_inputs.md).
 
 2.  Compute per-recruit objects and SPR-based reference points (e.g.,
-    $F_{40\%}$, $F_{35\%}$) using
+    F40%, F35%) using
     [`run_spr()`](https://noaa-afsc.github.io/tier4tools/reference/run_spr.md).
     Visualize results with
     [`plot_spr_curves()`](https://noaa-afsc.github.io/tier4tools/reference/plot_spr_curves.md).
