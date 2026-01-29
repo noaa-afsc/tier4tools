@@ -4,8 +4,8 @@ Title: Tier 4 Spawning Potential Ratio (SPR) Reference Points for NPFMC Groundfi
 Version: 0.1.0
 Date: 2026-01-30
 Authors@R: c(
-    person("Jane", "Sullivan", email = "jane.sullivan@noaa.gov", role = c("aut", "cre")),
-    person("Kristen", "Omori", email = "kristen.omori@noaa.gov", role = c("aut"))
+    person("Jane Y.", "Sullivan", email = "jane.sullivan@noaa.gov", role = c("aut", "cre")),
+    person("Kristen L.", "Omori", email = "kristen.omori@noaa.gov", role = c("aut"))
     )
 Description: Provides tools for computing fishing mortality–based spawning potential ratio (SPR) reference points for Tier 4 groundfish stock assessments used by the North Pacific Fishery Management Council. The package supports single-species and multispecies per-recruit analyses, sensitivity evaluation of key biological and fishery assumptions, and generation of report-ready graphics for stock assessments.
 Depends:
