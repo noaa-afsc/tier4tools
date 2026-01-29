@@ -1,4 +1,4 @@
-# tier4tools
+# tier4tools <img src="man/figures/tier4tools.png" align="right" alt="" width="200" />
 
 ### Tier 4 Spawning Potential Ratio (SPR) reference points in Alaska groundfish stock assessments
 
