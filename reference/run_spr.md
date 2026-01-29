@@ -120,32 +120,41 @@ A named list with the following elements:
 ## Details
 
 **SPR and YPR.** For each species, unfished spawning biomass per recruit
-(SBPR0) and fished SBPR(F) are computed from survivorship-at-age,
-weight-at-age, and maturity-at-age. SPR is defined as
-`SPR(F) = SBPR(F) / SBPR(0)`. YPR is computed using the Baranov catch
-equation in biomass units and the age-specific fishery selectivity.
+(\\SBPR\_{i,0}\\) and fished \\SBPR_i(F)\\ are computed from
+survivorship-at-age, weight-at-age, and maturity-at-age. SPR for species
+\\i\\ is defined as \\SPR_i(F) = SBPR_i(F) / SBPR\_{i,0}\\. YPR is
+computed using the Baranov catch equation in biomass units and
+age-specific fishery selectivity.
 
-**Multispecies complexes.** For multispecies inputs, each species is
-evaluated separately using its own life history schedules and
-recruitment scaling (i.e., recruitment proportions in
-[`spr_input()`](https://noaa-afsc.github.io/tier4tools/reference/spr_input.md)).
-Combined SBPR and yield are computed by summing across species.
+**Multispecies complexes.** For multispecies inputs, species-specific
+SBPR and YPR are computed separately using each species' life history
+schedules. Let \\SBPR_i(F)\\ denote spawning biomass per recruit for
+species \\i\\ at fishing mortality \\F\\, where \\SBPR_i(F)\\ is scaled
+by its unfished recruitment \\R\_{0,i}\\ via the initial numbers-at-age.
+Complex-level spawning biomass per recruit is computed by summation,
+\$\$ SBPR\_{total}(F) = \sum_i SBPR_i(F), \qquad SBPR\_{total,0} =
+\sum_i SBPR\_{i,0}, \$\$ and the combined SPR curve is obtained by \$\$
+SPR\_{total}(F) = SBPR\_{total}(F) / SBPR\_{total,0}. \$\$ The combined,
+or complex-level SBPR is used to calculate the "Unconstrained"
+multispecies reference points.
 
 **SPR reference points.** Fishing mortality reference points are
 reported for:
 
 - the combined complex (`F_spr_total`), based on matching the combined
-  SPR curve to each value in `spr_targets` using a nearest-grid
-  approach, and
+  SPR curve to each value in `spr_targets` using a grid search approach,
+  and
 
 - each species individually (`F_spr_by_species`).
 
 **Multispecies constraint.** When
-`multispecies_constraint = "all_species"`, a constrained reference point
-(`F_spr_total_constrained`) is calculated for each SPR target as the max
-F in `F_vec` such that *both* the combined SPR and each species-specific
-SPR meet or exceed the target. If no value satisfies the constraint,
-`NA` is returned for that target.
+`multispecies_constraint = "all_species"`, the constrained complex-level
+reference point for target \\x\\ is selected as the largest value of
+\\F\\ on `F_vec` such that every species meets the SPR target, \$\$
+SPR_i(F) \ge x \\\\ \text{for all } i, \$\$ and the combined curve also
+meets the target. This implementation corresponds to a limiting-species
+constraint and is approximately equivalent to \\\min_i F\_{x,i}\\ up to
+the resolution of the `F_vec` grid.
 
 **Diagnostics and decomposition outputs.** When `diagnostics = TRUE`,
 the output includes:

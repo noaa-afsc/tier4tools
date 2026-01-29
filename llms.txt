@@ -24,8 +24,7 @@ This package provides:
 `tier4tools` is under active development and is not yet on CRAN. You can
 install the development version from GitHub:
 
-    # install.packages("remotes")
-    remotes::install_github("noaa-afsc/tier4tools")
+    devtools::install_github("noaa-afsc/tier4tools", build_vignettes = TRUE)
 
 Issues, suggestions, and contributions are welcome via GitHub.
 
