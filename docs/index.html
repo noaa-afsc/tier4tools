@@ -46,7 +46,7 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="tier4tools-">tier4tools <img src="reference/figures/logo.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#tier4tools-"></a>
+<div class="page-header"><h1 id="tier4tools">tier4tools<a class="anchor" aria-label="anchor" href="#tier4tools"></a>
 </h1></div>
 <div class="section level3">
 <h3 id="tier-4-spawning-potential-ratio-spr-reference-points-in-alaska-groundfish-stock-assessments">Tier 4 Spawning Potential Ratio (SPR) reference points in Alaska groundfish stock assessments<a class="anchor" aria-label="anchor" href="#tier-4-spawning-potential-ratio-spr-reference-points-in-alaska-groundfish-stock-assessments"></a>
@@ -63,8 +63,7 @@
 <h2 id="installation-and-development">Installation and Development<a class="anchor" aria-label="anchor" href="#installation-and-development"></a>
 </h2>
 <p><code>tier4tools</code> is under active development and is not yet on CRAN. You can install the development version from GitHub:</p>
-<pre><code><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"noaa-afsc/tier4tools"</span><span class="op">)</span></span></code></pre>
+<pre><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"noaa-afsc/tier4tools"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
 <p>Issues, suggestions, and contributions are welcome via GitHub.</p>
 </div>
 <div class="section level2">
@@ -73,7 +72,7 @@
 <p>A typical Tier 4 analysis using <code>tier4tools</code> follows four main steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Define biological and fishery inputs using <code><a href="reference/spr_input.html">spr_input()</a></code>. Visualize and validate inputs using <code><a href="reference/plot_spr_inputs.html">plot_spr_inputs()</a></code>.</p></li>
-<li><p>Compute per-recruit objects and SPR-based reference points (e.g., <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>F</mi><mrow><mn>40</mn><mi>%</mi></mrow></msub><annotation encoding="application/x-tex">F_{40\%}</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>F</mi><mrow><mn>35</mn><mi>%</mi></mrow></msub><annotation encoding="application/x-tex">F_{35\%}</annotation></semantics></math>) using <code><a href="reference/run_spr.html">run_spr()</a></code>. Visualize results with <code><a href="reference/plot_spr_curves.html">plot_spr_curves()</a></code>.</p></li>
+<li><p>Compute per-recruit objects and SPR-based reference points (e.g., F40%, F35%) using <code><a href="reference/run_spr.html">run_spr()</a></code>. Visualize results with <code><a href="reference/plot_spr_curves.html">plot_spr_curves()</a></code>.</p></li>
 <li><p>Show age decomposition and plus group diagnostics for spawning biomass per recruit (SBPR) contributions, removals, and survivorship using <code><a href="reference/plot_spr_decomp.html">plot_spr_decomp()</a></code>.</p></li>
 <li><p>Run structured sensitivity analyses on key SPR input parameters (e.g., maturity, fishery selectivity, natural mortality) using <code><a href="reference/spr_sensitivity.html">spr_sensitivity()</a></code>. Visualize results using <code><a href="reference/plot_sensitivity_heatmap.html">plot_sensitivity_heatmap()</a></code>. For multispecies applications, sensitivity analyses for recruitment allocation by species are also available. These results can be visualized using <code><a href="reference/plot_recprop_sensitivity.html">plot_recprop_sensitivity()</a></code>.</p></li>
 </ol>
