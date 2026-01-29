@@ -2,9 +2,9 @@
 
 ## Authors
 
-- **Jane Sullivan**. Author, maintainer.
+- **Jane Y. Sullivan**. Author, maintainer.
 
-- **Kristen Omori**. Author.
+- **Kristen L. Omori**. Author.
 
 ## Citation
 
@@ -14,7 +14,7 @@ version 0.1.0.
 
     @Manual{,
       title = {tier4tools: Tier 4 Spawning Potential Ratio (SPR) Reference Points for NPFMC Groundfish Assessments},
-      author = {Jane Sullivan and Kristen Omori},
+      author = {Jane Y. Sullivan and Kristen L. Omori},
       year = {2026},
       note = {R package version 0.1.0},
     }
