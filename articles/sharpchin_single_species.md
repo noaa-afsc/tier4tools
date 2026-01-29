@@ -35,9 +35,9 @@ maturity-at-age estimates, and $M$ estimated using the Hoenig (1983)
 method. Fishery selectivity is poorly informed due to limited sampling
 and is therefore assumed to follow a knife-edge pattern.
 
-For the base case, $M = 0.052$, maturity is parameterized using a
+For the base case, $M = 0.059$, maturity is parameterized using a
 logistic maturity curve with midpoint $A_{50} = 10.06$ years and slope
-parameter $\delta = 1.96$. Fishery selectivity is assumed to be
+parameter $\delta = - 1.96$. Fishery selectivity is assumed to be
 knife-edge with full selection beginning at age $a_{c} = 10$ years. A
 maximum age of 58 years is assumed, and here we assume no plus group.
 
