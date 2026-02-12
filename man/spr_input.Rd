@@ -2,7 +2,8 @@
 % Please edit documentation in R/spr_inputs.R
 \name{spr_input}
 \alias{spr_input}
-\title{Construct SPR input object}
+\title{Construct SPR input objec
+t}
 \usage{
 spr_input(
   ages,
@@ -41,7 +42,12 @@ A named list with expanded, validated inputs for running SPR functions:
 }
 \description{
 Validates and expand inputs needed for per-recruit SPR/YPR calculations for
-one or multiple species.
+one or multiple species. If \code{selectivity$type = "fleets"},
+fleet-specific selectivity curves are combined into an effective
+selectivity-at-age vector using a \code{propF}-weighted mean. The per-recruit
+calculations use this effective selectivity. Fleet details may be retained in
+the output for transparency and plotting, but are not required for SPR/YPR
+calculations.
 }
 \details{
 For a single-species analysis, provide a single species specification via
@@ -54,8 +60,11 @@ Each species specification must include:
 \item \code{len_at_age}: list with \code{type="vb"} (Linf, k, t0) or \code{type="vector"} (L).
 \item \code{wt_at_age}: list with \code{type="wl"} (alpha, beta) or \code{type="vector"} (W).
 \item \code{maturity}: list with \code{type="logistic"} (a50, delta) or \code{type="vector"} (m).
-\item \code{selectivity}: list with \code{type="logistic"} (a50, delta), \code{type="knife_edge"} (a_c),
-or \code{type="vector"} (s).
+\item \code{selectivity}: list with \code{type="logistic"} (a50, delta),
+\code{type="knife_edge"} (a_c), \code{type="vector"} (s), or
+\code{type="fleets"} (multiple fleet selectivities). For
+\code{type="fleets"}, provide \code{fleets = list(<fleetname> = list(propF
+  = <weight>, selex = <selectivity_spec>), ...)}.
 \item \code{M}: numeric scalar or vector of length \code{length(ages)}.
 }
 
@@ -71,6 +80,8 @@ between growth and weight conversion.
 \examples{
 \dontrun{
 ages <- 3:52
+
+# single species example
 inp1 <- spr_input(
   ages = ages,
   species = list(
@@ -83,6 +94,27 @@ inp1 <- spr_input(
     )
 )
 
+# single species example with two fleets
+inp_fleets <- spr_input(
+  ages = ages,
+  species = list(
+    BS = list(
+      len_at_age   = list(type="vb", Linf=52.6, k=0.062, t0=0.2),
+      wt_at_age    = list(type="wl", alpha=8.13e-6, beta=3.177),
+      maturity     = list(type="logistic", a50=20, delta=-2),
+      selectivity  = list(
+        type = "fleets",
+        fleets = list(
+          trawl    = list(propF = 0.7, selex = list(type="logistic", a50=9, delta=-1.5)),
+          longline = list(propF = 0.3, selex = list(type="knife_edge", a_c=12))
+        )
+      ),
+      M = 0.042
+    )
+  )
+)
+
+# multispecies example
 inp2 <- spr_input(
   ages = ages,
   species = list(

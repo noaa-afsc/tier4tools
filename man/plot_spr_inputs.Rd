@@ -10,6 +10,7 @@ plot_spr_inputs(
   compare = NULL,
   panels = c("mat_selex", "wt", "len", "M"),
   overlay_maturity_selex = TRUE,
+  show_fleets = FALSE,
   return_data = FALSE
 )
 }
@@ -27,6 +28,9 @@ c("mat_selex","wt","len","M")}
 
 \item{overlay_maturity_selex}{Logical. If TRUE, maturity and selectivity are overlayed
 on a single plot (recommended).}
+
+\item{show_fleets}{Logical. If TRUE, and if fleet-specific selectivity is available,
+overlays fleet selectivity curves and the effective selectivity curve. Default FALSE.}
 
 \item{return_data}{Logical. If TRUE, returns a list with plots and the tidy data used.}
 }
