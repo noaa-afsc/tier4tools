@@ -5,12 +5,15 @@
 #'
 #' @return A ggplot2 theme object.
 #' @export
-theme_tier4 <- function() {
-  ggplot2::theme_bw() +
+theme_tier4 <- function(base_size = 12) {
+  ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(
       panel.grid = ggplot2::element_blank(),
       strip.background = ggplot2::element_blank(),
-      legend.position = "right"
+      legend.position = "right",
+      # Increase legend key size
+      legend.key.size = grid::unit(1.2, "lines"),
+      legend.spacing.y = grid::unit(0.4, "lines")
     )
 }
 

@@ -4,7 +4,7 @@
 \alias{theme_tier4}
 \title{Tier 4 default ggplot theme}
 \usage{
-theme_tier4()
+theme_tier4(base_size = 12)
 }
 \value{
 A ggplot2 theme object.
