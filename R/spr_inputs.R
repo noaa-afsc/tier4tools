@@ -47,6 +47,21 @@ calc_len_at_age <- function(ages, len_at_age) {
   stop("Unknown len_at_age$type. Use 'vb' or 'vector'.")
 }
 
+#' Length-at-age
+#'
+#' Build a length-at-age vector from a length specification.
+#'
+#' This is a user-facing wrapper around an internal helper used by
+#' [spr_input()]. It is useful for sensitivity analyses where the user wants to
+#' modify the length-at-age specification of an existing [spr_input()] object.
+#'
+#' @inheritParams calc_len_at_age
+#' @return Numeric vector of length \code{length(ages)}.
+#' @export
+len_at_age <- function(ages, len_at_age) {
+  calc_len_at_age(ages = ages, len_at_age = len_at_age)
+}
+
 #' Weight-at-age
 #'
 #' Convert a user-specified weight-at-age specification into an age-specific vector
@@ -100,6 +115,22 @@ calc_wt_at_age <- function(ages, wt_at_age, len_at_age = NULL) {
   stop("Unknown wt_at_age$type. Use 'wl' or 'vector'.")
 }
 
+#' Weight-at-age
+#'
+#' Build a weight-at-age vector from a weight specification.
+#'
+#' This is a user-facing wrapper around an internal helper used by
+#' [spr_input()]. It is useful for sensitivity analyses where the user wants to
+#' modify the weight specification of an existing [spr_input()] object.
+#'
+#' Use \code{len_at_age} when \code{wt_at_age$type == "wl"}.
+#'
+#' @inheritParams calc_wt_at_age
+#' @return Numeric vector of length \code{length(ages)}.
+#' @export
+wt_at_age <- function(ages, wt_at_age, len_at_age = NULL) {
+  calc_wt_at_age(ages = ages, wt_at_age = wt_at_age, len_at_age = len_at_age)
+}
 
 #' Maturity-at-age
 #'
@@ -150,6 +181,22 @@ calc_maturity_at_age <- function(ages, maturity) {
   stop("Unknown maturity$type. Use 'vector' or 'logistic'.")
 }
 
+#' Maturity-at-age
+#'
+#' Build a maturity-at-age vector from a maturity specification.
+#'
+#' This is a user-facing wrapper around an internal helper used by
+#' [spr_input()]. It is useful for sensitivity analyses where the user wants to
+#' modify the maturity specification of an existing [spr_input()] object.
+#'
+#' It returns maturity bounded to \eqn{[0,1]}.
+#'
+#' @inheritParams calc_maturity_at_age
+#' @return Numeric vector of length \code{length(ages)} with values in \eqn{[0,1]}.
+#' @export
+maturity_at_age <- function(ages, maturity) {
+  calc_maturity_at_age(ages = ages, maturity = maturity)
+}
 
 #' Fishery selectivity-at-age
 #'
@@ -294,8 +341,28 @@ calc_selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
 
 }
 
-#' Construct SPR input objec
-#' t
+#' Fishery selectivity-at-age
+#'
+#' Build a selectivity-at-age vector from a selectivity specification.
+#'
+#' This is a user-facing wrapper around an internal helper used by
+#' [spr_input()]. It is useful for sensitivity analyses where the user wants to
+#' modify the fishery selectivity specification of an existing [spr_input()]
+#' object.
+#'
+#' It returns selectivity bounded to \eqn{[0,1]} and can optionally scale so that
+#' \code{max(s_a) = 1}.
+#'
+#' @inheritParams calc_selectivity_at_age
+#' @return Numeric vector of length \code{length(ages)} with values in \eqn{[0,1]}.
+#'   When \code{selectivity$type == "fleets"}, the returned vector is the effective
+#'   selectivity-at-age.
+#' @export
+selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
+  calc_selectivity_at_age(ages = ages, selectivity = selectivity, scale_max = scale_max)
+}
+
+#' Construct SPR input object
 #'
 #' Validates and expand inputs needed for per-recruit SPR/YPR calculations for
 #' one or multiple species. If \code{selectivity$type = "fleets"},
@@ -736,7 +803,7 @@ plot_spr_inputs <- function(
             ggplot2::aes(x = age, y = value, linetype = quantity, group = quantity)
           ) +
             ggplot2::geom_line(linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 2)) +
+            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 3)) +
             ggplot2::labs(x = "Age", y = "Maturity or selectivity", linetype = NULL) +
             ggplot2::coord_cartesian(ylim = c(0, 1))
 
@@ -764,7 +831,7 @@ plot_spr_inputs <- function(
             ggplot2::aes(x = age, y = value, color = species, linetype = quantity)
           ) +
             ggplot2::geom_line(linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 2)) +
+            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 3)) +
             ggplot2::labs(
               x = "Age",
               y = "Maturity or selectivity",
