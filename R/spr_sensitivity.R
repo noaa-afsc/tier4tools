@@ -766,13 +766,14 @@ plot_recprop_sensitivity <- function(
 
   # ---- Main plot of reference point F as a function of recruitment proportion
   p_main <- ggplot2::ggplot(df_long, ggplot2::aes(x = prop_value, y = F, color = target, linetype = method)) +
+    ggplot2::scale_linetype_manual(values = c("solid", "dotted")) +
     ggplot2::geom_line(linewidth = 1) +
-    ggplot2::geom_vline(xintercept = 0.5, linetype = 3) +   # 50/50 prop ref
+    ggplot2::geom_vline(xintercept = 0.5, linetype = 2) +   # 50/50 prop ref
     ggplot2::labs(x = xlab, y = ylab, color = NULL, linetype = NULL, title = title) +
     scale_color_tier4() + theme_tier4()
 
   if (isTRUE(show_delta)) {
-    p_main <- p_main + ggplot2::geom_hline(yintercept = 0, linetype = 3) # deltaF = 0 ref
+    p_main <- p_main + ggplot2::geom_hline(yintercept = 0, linetype = 2) # deltaF = 0 ref
   }
 
   if (!isTRUE(include_species) && !isTRUE(include_yield_share)) return(p_main)
@@ -815,7 +816,7 @@ plot_recprop_sensitivity <- function(
 
       out$limiting_species <- ggplot2::ggplot(lim_df, ggplot2::aes(x = prop_value, y = 1, fill = limiting_species)) +
         ggplot2::geom_tile() +
-        ggplot2::geom_vline(xintercept = 0.5, linetype = 3) +
+        ggplot2::geom_vline(xintercept = 0.5, linetype = 2) +
         ggplot2::facet_wrap(~ target, ncol = 1) +
         ggplot2::scale_y_continuous(breaks = NULL) +
         ggplot2::labs(x = xlab, y = NULL, fill = "Limiting species",
@@ -873,9 +874,10 @@ plot_recprop_sensitivity <- function(
       out$yield_share <- ggplot2::ggplot(sh |>
                                            dplyr::filter(species == sp[1]),
                                          ggplot2::aes(x = prop_value, y = share, color = target, linetype = method)) +
+        ggplot2::scale_linetype_manual(values = c("solid", "dotted")) +
         ggplot2::geom_line(linewidth = 1) +
-        ggplot2::geom_vline(xintercept = 0.5, linetype = 3) +
-        ggplot2::geom_hline(yintercept = 0.5, linetype = 3) +
+        ggplot2::geom_vline(xintercept = 0.5, linetype = 2) +
+        ggplot2::geom_hline(yintercept = 0.5, linetype = 2) +
         ggplot2::facet_wrap(~ species, ncol = 1) +
         ggplot2::coord_cartesian(ylim = c(0, 1)) +
         ggplot2::labs(x = xlab, y = paste0("Yield share of ", sp[1]),

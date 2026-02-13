@@ -517,7 +517,7 @@ plot_spr_decomp <- function(
   # Single shared linetype scale for all panels that use Flevel
   add_Flevel_linetype <- function(p) {
     p + ggplot2::scale_linetype_manual(
-      values = c(Ftarget = "solid", F0 = "dashed"),
+      values = c(Ftarget = "solid", F0 = "dotted"),
       breaks = c("Ftarget", "F0"),
       labels = c("F at SPR target", "Unfished (F0)")
     )

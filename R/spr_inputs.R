@@ -581,7 +581,7 @@ plot_spr_inputs <- function(
             ggplot2::aes(x = age, y = value, linetype = quantity, group = quantity)
           ) +
             ggplot2::geom_line(linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 2)) +
+            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 3)) +
             ggplot2::labs(x = "Age", y = "Maturity or selectivity", linetype = NULL) +
             ggplot2::coord_cartesian(ylim = c(0, 1))
           p <- facet_if_needed(p)
@@ -595,7 +595,7 @@ plot_spr_inputs <- function(
             ggplot2::aes(x = age, y = value, color = species, linetype = quantity)
           ) +
             ggplot2::geom_line(linewidth = 1) +
-            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 2)) +
+            ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 3)) +
             ggplot2::labs(
               x = "Age",
               y = "Maturity or selectivity",
