@@ -178,19 +178,26 @@ differences among species</li>
 <span><span class="co"># the "patchwork" R library</span></span>
 <span><span class="fu"><a href="../reference/grid_spr_inputs.html">grid_spr_inputs</a></span><span class="op">(</span><span class="va">inp_plots</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mat_selex"</span>, <span class="st">"wt"</span>,<span class="st">"len"</span>,<span class="st">"M"</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span>, guides <span class="op">=</span> <span class="st">"keep"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sharpchin_single_species_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
-<p>If you are comparing scenarios, you can pass multiple
-<code><a href="../reference/spr_input.html">spr_input()</a></code> objects via <code>compare</code> and facet by
-scenario:</p>
+<p>If you are comparing scenarios in a sensitivity analysis, you can
+pass multiple <code><a href="../reference/spr_input.html">spr_input()</a></code> objects via <code>compare</code>
+and facet by scenario:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Example: requires you to construct additional spr_input objects, which</span></span>
-<span><span class="co"># can be done by creating new input objects from scratch or by modifying</span></span>
-<span><span class="co"># existing input objects as shown below</span></span>
-<span><span class="co"># inp_sens1 &lt;- inp</span></span>
-<span><span class="co"># inp_sens1$species$Sharpchin$selex_at_age &lt;- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 8))</span></span>
-<span><span class="co"># inp_sens2 &lt;- inp</span></span>
-<span><span class="co"># inp_sens2$species$Sharpchin$selex_at_age &lt;- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 12))</span></span>
-<span><span class="co"># inp_plots &lt;- plot_spr_inputs(x = inp, compare = list(Sens1 = inp_sens1, Sens2 = inp_sens2), )</span></span>
-<span><span class="co"># inp_plots$mat_selex</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Example (**code only shown, not run**): construct additional spr_input</span></span>
+<span><span class="co"># objects, either from scratch or by modifying existing input objects as shown</span></span>
+<span><span class="co"># below using public-facing functions like selectivity_at_age(),</span></span>
+<span><span class="co"># maturity_at_age(), wt_at_age(), or len_at_age()</span></span>
+<span></span>
+<span><span class="co"># sensitivity 1 (knife-edge selectivity with max selectivity at age 5)</span></span>
+<span><span class="va">inp_sens1</span> <span class="op">&lt;-</span> <span class="va">inp</span> </span>
+<span><span class="va">inp_sens1</span><span class="op">$</span><span class="va">species</span><span class="op">$</span><span class="va">Sharpchin</span><span class="op">$</span><span class="va">selex_at_age</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/selectivity_at_age.html">selectivity_at_age</a></span><span class="op">(</span>ages <span class="op">=</span> <span class="va">inp</span><span class="op">$</span><span class="va">ages</span>, selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"knife_edge"</span>, a_c <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># sensitivity 2 (knife-edge selectivity with max selectivity at age 5)</span></span>
+<span><span class="va">inp_sens2</span> <span class="op">&lt;-</span> <span class="va">inp</span> </span>
+<span><span class="va">inp_sens2</span><span class="op">$</span><span class="va">species</span><span class="op">$</span><span class="va">Sharpchin</span><span class="op">$</span><span class="va">selex_at_age</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/selectivity_at_age.html">selectivity_at_age</a></span><span class="op">(</span>ages <span class="op">=</span> <span class="va">inp</span><span class="op">$</span><span class="va">ages</span>, selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"knife_edge"</span>, a_c <span class="op">=</span> <span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># show base + sensitivities</span></span>
+<span><span class="va">inp_plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_spr_inputs.html">plot_spr_inputs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">inp</span>, compare <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Sens1 <span class="op">=</span> <span class="va">inp_sens1</span>, Sens2 <span class="op">=</span> <span class="va">inp_sens2</span><span class="op">)</span>, <span class="op">)</span></span>
+<span><span class="va">inp_plots</span><span class="op">$</span><span class="va">mat_selex</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="run-per-recruit-spr-and-ypr-with-run_spr">Run per-recruit SPR and YPR with <code>run_spr()</code><a class="anchor" aria-label="anchor" href="#run-per-recruit-spr-and-ypr-with-run_spr"></a>

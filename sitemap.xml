@@ -12,6 +12,8 @@
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/grid_spr_decomp.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/grid_spr_inputs.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/index.html</loc></url>
+<url><loc>https://noaa-afsc.github.io/tier4tools/reference/len_at_age.html</loc></url>
+<url><loc>https://noaa-afsc.github.io/tier4tools/reference/maturity_at_age.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/plot_recprop_sensitivity.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/plot_sensitivity_heatmap.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/plot_spr_curves.html</loc></url>
@@ -20,9 +22,11 @@
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/run_spr.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/scale_color_tier4.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/scale_fill_tier4.html</loc></url>
+<url><loc>https://noaa-afsc.github.io/tier4tools/reference/selectivity_at_age.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/spr_input.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/spr_sensitivity.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/theme_tier4.html</loc></url>
 <url><loc>https://noaa-afsc.github.io/tier4tools/reference/tier4_palette_cb.html</loc></url>
+<url><loc>https://noaa-afsc.github.io/tier4tools/reference/wt_at_age.html</loc></url>
 </urlset>
 

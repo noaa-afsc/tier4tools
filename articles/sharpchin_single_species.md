@@ -113,20 +113,28 @@ grid_spr_inputs(inp_plots, order = c("mat_selex", "wt","len","M"), ncol = 2, gui
 
 ![](sharpchin_single_species_files/figure-html/unnamed-chunk-2-1.png)
 
-If you are comparing scenarios, you can pass multiple
+If you are comparing scenarios in a sensitivity analysis, you can pass
+multiple
 [`spr_input()`](https://noaa-afsc.github.io/tier4tools/reference/spr_input.md)
 objects via `compare` and facet by scenario:
 
 ``` r
-# Example: requires you to construct additional spr_input objects, which
-# can be done by creating new input objects from scratch or by modifying
-# existing input objects as shown below
-# inp_sens1 <- inp
-# inp_sens1$species$Sharpchin$selex_at_age <- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 8))
-# inp_sens2 <- inp
-# inp_sens2$species$Sharpchin$selex_at_age <- tier4tools::calc_selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 12))
-# inp_plots <- plot_spr_inputs(x = inp, compare = list(Sens1 = inp_sens1, Sens2 = inp_sens2), )
-# inp_plots$mat_selex
+# Example (**code only shown, not run**): construct additional spr_input
+# objects, either from scratch or by modifying existing input objects as shown
+# below using public-facing functions like selectivity_at_age(),
+# maturity_at_age(), wt_at_age(), or len_at_age()
+
+# sensitivity 1 (knife-edge selectivity with max selectivity at age 5)
+inp_sens1 <- inp 
+inp_sens1$species$Sharpchin$selex_at_age <- selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 5))
+
+# sensitivity 2 (knife-edge selectivity with max selectivity at age 5)
+inp_sens2 <- inp 
+inp_sens2$species$Sharpchin$selex_at_age <- selectivity_at_age(ages = inp$ages, selectivity = list(type = "knife_edge", a_c = 15))
+
+# show base + sensitivities
+inp_plots <- plot_spr_inputs(x = inp, compare = list(Sens1 = inp_sens1, Sens2 = inp_sens2), )
+inp_plots$mat_selex
 ```
 
 ## Run per-recruit SPR and YPR with `run_spr()`
