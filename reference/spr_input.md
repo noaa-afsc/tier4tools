@@ -1,7 +1,12 @@
-# Construct SPR input object
+# Construct SPR input objec t
 
 Validates and expand inputs needed for per-recruit SPR/YPR calculations
-for one or multiple species.
+for one or multiple species. If `selectivity$type = "fleets"`,
+fleet-specific selectivity curves are combined into an effective
+selectivity-at-age vector using a `propF`-weighted mean. The per-recruit
+calculations use this effective selectivity. Fleet details may be
+retained in the output for transparency and plotting, but are not
+required for SPR/YPR calculations.
 
 ## Usage
 
@@ -80,7 +85,9 @@ Each species specification must include:
   `type="vector"` (m).
 
 - `selectivity`: list with `type="logistic"` (a50, delta),
-  `type="knife_edge"` (a_c), or `type="vector"` (s).
+  `type="knife_edge"` (a_c), `type="vector"` (s), or `type="fleets"`
+  (multiple fleet selectivities). For `type="fleets"`, provide
+  `fleets = list(<fleetname> = list(propF = <weight>, selex = <selectivity_spec>), ...)`.
 
 - `M`: numeric scalar or vector of length `length(ages)`.
 

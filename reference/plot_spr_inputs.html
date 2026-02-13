@@ -59,6 +59,7 @@ Optional panels include length-at-age and M-at-age.</p></li>
 <span>  compare <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  panels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mat_selex"</span>, <span class="st">"wt"</span>, <span class="st">"len"</span>, <span class="st">"M"</span><span class="op">)</span>,</span>
 <span>  overlay_maturity_selex <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_fleets <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  return_data <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -89,6 +90,11 @@ c("mat_selex","wt","len","M")</p></dd>
 <dt id="arg-overlay-maturity-selex">overlay_maturity_selex<a class="anchor" aria-label="anchor" href="#arg-overlay-maturity-selex"></a></dt>
 <dd><p>Logical. If TRUE, maturity and selectivity are overlayed
 on a single plot (recommended).</p></dd>
+
+
+<dt id="arg-show-fleets">show_fleets<a class="anchor" aria-label="anchor" href="#arg-show-fleets"></a></dt>
+<dd><p>Logical. If TRUE, and if fleet-specific selectivity is available,
+overlays fleet selectivity curves and the effective selectivity curve. Default FALSE.</p></dd>
 
 
 <dt id="arg-return-data">return_data<a class="anchor" aria-label="anchor" href="#arg-return-data"></a></dt>

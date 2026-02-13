@@ -58,7 +58,10 @@ bounded to \([0, 1]\) and may optionally be scaled so that <code>max(s_a) = 1</c
 <dt id="arg-selectivity">selectivity<a class="anchor" aria-label="anchor" href="#arg-selectivity"></a></dt>
 <dd><p>A named list specifying selectivity. Required element <code>type</code>.
 For <code>type="vector"</code>, provide <code>s</code>. For <code>type="knife_edge"</code>, provide <code>a_c</code>.
-For <code>type="logistic"</code>, provide <code>a50</code> and <code>delta</code>.</p></dd>
+For <code>type="logistic"</code>, provide <code>a50</code> and <code>delta</code>.
+For <code>type="fleets"</code>, provide <code>fleets</code>, a named list of fleets. Each fleet must include
+<code>propF</code> (nonnegative, used as a weight on \(F\)) and <code>selex</code> (a selectivity specification of
+type <code>"vector"</code>, <code>"knife_edge"</code>, or <code>"logistic"</code>).</p></dd>
 
 
 <dt id="arg-scale-max">scale_max<a class="anchor" aria-label="anchor" href="#arg-scale-max"></a></dt>
@@ -74,10 +77,16 @@ For <code>type="logistic"</code>, provide <code>a50</code> and <code>delta</code
     <p>Supported inputs:</p><ul><li><p><code>type = "vector"</code>: external selectivity vector <code>s</code> with <code>length(s) == length(ages)</code>.</p></li>
 <li><p><code>type = "knife_edge"</code>: step function with age-at-full-selection <code>a_c</code>.</p></li>
 <li><p><code>type = "logistic"</code>: logistic curve with parameters <code>a50</code> and <code>delta</code>.</p></li>
+<li><p><code>type = "fleets"</code>: multiple fisheries with fleet-specific selectivity curves and fishing mortality weights.
+Provide <code>fleets = list(&lt;fleetname&gt; = list(propF = &lt;weight&gt;, selex = &lt;selectivity_spec&gt;), ...)</code>.
+Fleet selectivities are collapsed into an effective selectivity-at-age vector using a <code>propF</code>-weighted mean.</p></li>
 </ul><p>Knife-edge form:
 $$s_a = 0 \text{ for } a &lt; a_c,\quad s_a = 1 \text{ for } a \ge a_c$$</p>
 <p>Logistic form:
 $$s_a = \frac{1}{1 + \exp\left(\frac{a - a_{50}}{\delta}\right)}$$</p>
+<p>Multi-fleet option:
+When <code>type="fleets"</code>, the function returns an effective selectivity-at-age vector
+\(s^\*a = \sum_f \lambda_f s{f,a}\), where \(\lambda_f\) are the normalized <code>propF</code> weights.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -21,7 +21,11 @@ calc_selectivity_at_age(ages, selectivity, scale_max = TRUE)
 
   A named list specifying selectivity. Required element `type`. For
   `type="vector"`, provide `s`. For `type="knife_edge"`, provide `a_c`.
-  For `type="logistic"`, provide `a50` and `delta`.
+  For `type="logistic"`, provide `a50` and `delta`. For `type="fleets"`,
+  provide `fleets`, a named list of fleets. Each fleet must include
+  `propF` (nonnegative, used as a weight on \\F\\) and `selex` (a
+  selectivity specification of type `"vector"`, `"knife_edge"`, or
+  `"logistic"`).
 
 - scale_max:
 
@@ -43,8 +47,18 @@ Supported inputs:
 
 - `type = "logistic"`: logistic curve with parameters `a50` and `delta`.
 
+- `type = "fleets"`: multiple fisheries with fleet-specific selectivity
+  curves and fishing mortality weights. Provide
+  `fleets = list(<fleetname> = list(propF = <weight>, selex = <selectivity_spec>), ...)`.
+  Fleet selectivities are collapsed into an effective selectivity-at-age
+  vector using a `propF`-weighted mean.
+
 Knife-edge form: \$\$s_a = 0 \text{ for } a \< a_c,\quad s_a = 1 \text{
 for } a \ge a_c\$\$
 
 Logistic form: \$\$s_a = \frac{1}{1 + \exp\left(\frac{a -
 a\_{50}}{\delta}\right)}\$\$
+
+Multi-fleet option: When `type="fleets"`, the function returns an
+effective selectivity-at-age vector \\s^\\a = \sum_f \lambda_f s{f,a}\\,
+where \\\lambda_f\\ are the normalized `propF` weights.

@@ -70,7 +70,7 @@ str(inp, max.level = 3)
 #>  $ rec_prop      : Named num 1
 #>   ..- attr(*, "names")= chr "Sharpchin"
 #>  $ species       :List of 1
-#>   ..$ Sharpchin:List of 11
+#>   ..$ Sharpchin:List of 14
 #>   .. ..$ name           : chr "Sharpchin"
 #>   .. ..$ R0_base        : num 1
 #>   .. ..$ R0             : num 1
@@ -79,6 +79,9 @@ str(inp, max.level = 3)
 #>   .. ..$ wt_at_age      : num [1:101] 0.000364 0.004041 0.013461 0.02918 0.050679 ...
 #>   .. ..$ maturity_at_age: num [1:101] 0.00587 0.00973 0.01611 0.02654 0.04345 ...
 #>   .. ..$ selex_at_age   : num [1:101] 0 0 0 0 0 0 0 0 0 0 ...
+#>   .. ..$ selex_fleets   : NULL
+#>   .. ..$ selex_propF    : NULL
+#>   .. ..$ selex_spec     :List of 2
 #>   .. ..$ maturity_delta : num -1.96
 #>   .. ..$ maturity_spec  :List of 3
 #>   .. ..$ spec           :List of 5

@@ -103,7 +103,7 @@ Detailed examples are available in the package vignettes, including:
 - [`selectivity_at_age()`](https://noaa-afsc.github.io/tier4tools/reference/selectivity_at_age.md)
   : Fishery selectivity-at-age
 - [`spr_input()`](https://noaa-afsc.github.io/tier4tools/reference/spr_input.md)
-  : Construct SPR input object
+  : Construct SPR input objec t
 - [`spr_sensitivity()`](https://noaa-afsc.github.io/tier4tools/reference/spr_sensitivity.md)
   : Sensitivity analysis for SPR reference points
 - [`theme_tier4()`](https://noaa-afsc.github.io/tier4tools/reference/theme_tier4.md)
