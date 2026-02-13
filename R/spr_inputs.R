@@ -209,6 +209,9 @@ maturity_at_age <- function(ages, maturity) {
 #'   \item \code{type = "vector"}: external selectivity vector \code{s} with \code{length(s) == length(ages)}.
 #'   \item \code{type = "knife_edge"}: step function with age-at-full-selection \code{a_c}.
 #'   \item \code{type = "logistic"}: logistic curve with parameters \code{a50} and \code{delta}.
+#'   \item \code{type = "fleets"}: multiple fisheries with fleet-specific selectivity curves and fishing mortality weights.
+#'     Provide \code{fleets = list(<fleetname> = list(propF = <weight>, selex = <selectivity_spec>), ...)}.
+#'     Fleet selectivities are collapsed into an effective selectivity-at-age vector using a \code{propF}-weighted mean.
 #' }
 #'
 #' Knife-edge form:
@@ -217,10 +220,17 @@ maturity_at_age <- function(ages, maturity) {
 #' Logistic form:
 #' \deqn{s_a = \frac{1}{1 + \exp\left(\frac{a - a_{50}}{\delta}\right)}}
 #'
+#' Multi-fleet option:
+#' When \code{type="fleets"}, the function returns an effective selectivity-at-age vector
+#' \eqn{s^\*a = \sum_f \lambda_f s{f,a}}, where \eqn{\lambda_f} are the normalized \code{propF} weights.
+#'
 #' @param ages Numeric vector of ages (e.g., \code{a_min:a_max}).
 #' @param selectivity A named list specifying selectivity. Required element \code{type}.
 #'   For \code{type="vector"}, provide \code{s}. For \code{type="knife_edge"}, provide \code{a_c}.
 #'   For \code{type="logistic"}, provide \code{a50} and \code{delta}.
+#'   For \code{type="fleets"}, provide \code{fleets}, a named list of fleets. Each fleet must include
+#'   \code{propF} (nonnegative, used as a weight on \eqn{F}) and \code{selex} (a selectivity specification of
+#'   type \code{"vector"}, \code{"knife_edge"}, or \code{"logistic"}).
 #' @param scale_max Logical. If \code{TRUE}, scales selectivity so that \code{max(s_a) = 1} when possible.
 #'
 #' @return Numeric vector \code{selectivity_at_age} with \code{length(ages)}.
@@ -268,7 +278,67 @@ calc_selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
     return(as.numeric(s))
   }
 
-  stop("Unknown selectivity$type. Use 'vector', 'knife_edge', or 'logistic'.")
+  # keep selectivity bounded and scaled
+  bound_and_scale <- function(s, scale_max = TRUE) {
+    s <- as.numeric(s)
+    s <- pmin(1, pmax(0, s))
+    if (scale_max) {
+      smax <- max(s, na.rm = TRUE)
+      if (is.finite(smax) && smax > 0) s <- s / smax
+      s <- pmin(1, pmax(0, s))
+    }
+    as.numeric(s)
+  }
+
+  # Multiple fleets collapsed into an effective selectivity
+  if (selectivity$type == "fleets") {
+    fleets <- selectivity$fleets
+    if (is.null(fleets) || !is.list(fleets) || length(fleets) == 0) {
+      stop("For selectivity$type = 'fleets', provide a non-empty selectivity$fleets list.")
+    }
+    if (is.null(names(fleets)) || any(names(fleets) == "")) {
+      stop("selectivity$fleets must be a named list, e.g., list(trawl=..., longline=...).")
+    }
+
+    propF <- vapply(fleets, function(z) z$propF, numeric(1))
+    if (any(!is.finite(propF))) stop("selectivity$type='fleets': all fleet propF values must be finite.")
+    if (any(propF < 0)) stop("selectivity$type='fleets': all fleet propF must be nonnegative.")
+    sprop <- sum(propF)
+    if (!is.finite(sprop) || sprop <= 0) stop("selectivity$type='fleets': sum(propF) must be > 0.")
+    # normalize, but you can make this strict if you prefer
+    propF_norm <- propF / sprop
+
+    # Expand each fleet selex spec using the same function (recursive call)
+    s_fleet <- sapply(fleets, function(z) {
+      if (is.null(z$selex) || !is.list(z$selex) || is.null(z$selex$type)) {
+        stop("selectivity$type='fleets': each fleet must include $selex as a list with element 'type'.")
+      }
+      calc_selectivity_at_age(ages, z$selex, scale_max = scale_max)
+    })
+
+    # Ensure matrix shape even if only one fleet
+    if (is.null(dim(s_fleet))) {
+      s_fleet <- matrix(s_fleet, ncol = 1)
+      colnames(s_fleet) <- names(fleets)[1]
+    }
+
+    # Collapse into effective selectivity
+    s_eff <- as.numeric(s_fleet %*% propF_norm)
+    s_eff <- bound_and_scale(s_eff, scale_max = scale_max)
+
+    # Attach fleet details for downstream use
+    attr(s_eff, "fleet_details") <- list(
+      fleets = names(fleets),
+      propF_raw = propF,
+      propF = propF_norm,
+      selex_fleet = s_fleet,
+      selex_effective = s_eff
+    )
+
+    return(s_eff)
+  }
+  stop("Unknown selectivity$type. Use 'vector', 'knife_edge', 'logistic', or 'fleets'.")
+
 }
 
 #' Fishery selectivity-at-age
@@ -295,7 +365,12 @@ selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
 #' Construct SPR input object
 #'
 #' Validates and expand inputs needed for per-recruit SPR/YPR calculations for
-#' one or multiple species.
+#' one or multiple species. If \code{selectivity$type = "fleets"},
+#' fleet-specific selectivity curves are combined into an effective
+#' selectivity-at-age vector using a \code{propF}-weighted mean. The per-recruit
+#' calculations use this effective selectivity. Fleet details may be retained in
+#' the output for transparency and plotting, but are not required for SPR/YPR
+#' calculations.
 #'
 #' For a single-species analysis, provide a single species specification via
 #' `species` (can be named or unnamed). For multispecies analyses, provide a
@@ -307,8 +382,11 @@ selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
 #'   \item \code{len_at_age}: list with \code{type="vb"} (Linf, k, t0) or \code{type="vector"} (L).
 #'   \item \code{wt_at_age}: list with \code{type="wl"} (alpha, beta) or \code{type="vector"} (W).
 #'   \item \code{maturity}: list with \code{type="logistic"} (a50, delta) or \code{type="vector"} (m).
-#'   \item \code{selectivity}: list with \code{type="logistic"} (a50, delta), \code{type="knife_edge"} (a_c),
-#'     or \code{type="vector"} (s).
+#'   \item \code{selectivity}: list with \code{type="logistic"} (a50, delta),
+#'   \code{type="knife_edge"} (a_c), \code{type="vector"} (s), or
+#'   \code{type="fleets"} (multiple fleet selectivities). For
+#'   \code{type="fleets"}, provide \code{fleets = list(<fleetname> = list(propF
+#'   = <weight>, selex = <selectivity_spec>), ...)}.
 #'   \item \code{M}: numeric scalar or vector of length \code{length(ages)}.
 #' }
 #'
@@ -344,6 +422,8 @@ selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
 #' @examples
 #' \dontrun{
 #' ages <- 3:52
+#'
+#' # single species example
 #' inp1 <- spr_input(
 #'   ages = ages,
 #'   species = list(
@@ -356,6 +436,27 @@ selectivity_at_age <- function(ages, selectivity, scale_max = TRUE) {
 #'     )
 #' )
 #'
+#' # single species example with two fleets
+#' inp_fleets <- spr_input(
+#'   ages = ages,
+#'   species = list(
+#'     BS = list(
+#'       len_at_age   = list(type="vb", Linf=52.6, k=0.062, t0=0.2),
+#'       wt_at_age    = list(type="wl", alpha=8.13e-6, beta=3.177),
+#'       maturity     = list(type="logistic", a50=20, delta=-2),
+#'       selectivity  = list(
+#'         type = "fleets",
+#'         fleets = list(
+#'           trawl    = list(propF = 0.7, selex = list(type="logistic", a50=9, delta=-1.5)),
+#'           longline = list(propF = 0.3, selex = list(type="knife_edge", a_c=12))
+#'         )
+#'       ),
+#'       M = 0.042
+#'     )
+#'   )
+#' )
+#'
+#' # multispecies example
 #' inp2 <- spr_input(
 #'   ages = ages,
 #'   species = list(
@@ -457,9 +558,12 @@ spr_input <- function(
     mat <- calc_maturity_at_age(ages, sp$maturity)
     sel <- calc_selectivity_at_age(ages, sp$selectivity, scale_max = scale_selex)
 
+    #
+    sel_details <- attr(sel, "fleet_details")
+    if (!is.null(sel_details)) attr(sel, "fleet_details") <- NULL
+
     list(
       name = sp_name,
-
 
       R0_base = as.numeric(R0), # store baseline and scaled recruitment
       R0 = as.numeric(R0 * rec_prop[sp_name]),  # per-species recruitment scaling for multispecies
@@ -469,6 +573,11 @@ spr_input <- function(
       wt_at_age = as.numeric(W),
       maturity_at_age = as.numeric(mat),
       selex_at_age = as.numeric(sel),
+
+      # fleet selectivity attributes
+      selex_fleets = if (!is.null(sel_details)) sel_details$selex_fleet else NULL,
+      selex_propF  = if (!is.null(sel_details)) sel_details$propF else NULL,
+      selex_spec   = sp$selectivity,
 
       # store maturity parameterization for sensitivity analyses
       maturity_delta = if (is.list(sp$maturity) && identical(sp$maturity$type, "logistic")) {
@@ -512,6 +621,8 @@ spr_input <- function(
 #'   c("mat_selex","wt","len","M")
 #' @param overlay_maturity_selex Logical. If TRUE, maturity and selectivity are overlayed
 #'   on a single plot (recommended).
+#' @param show_fleets Logical. If TRUE, and if fleet-specific selectivity is available,
+#'   overlays fleet selectivity curves and the effective selectivity curve. Default FALSE.
 #' @param return_data Logical. If TRUE, returns a list with plots and the tidy data used.
 #'
 #' @return By default, returns a named list of ggplot objects. If return_data=TRUE,
@@ -523,6 +634,7 @@ plot_spr_inputs <- function(
     compare = NULL,
     panels = c("mat_selex", "wt", "len", "M"),
     overlay_maturity_selex = TRUE,
+    show_fleets = FALSE,
     return_data = FALSE
   ) {
     if (!is.list(x) || is.null(x$ages) || is.null(x$species)) {
@@ -554,9 +666,12 @@ plot_spr_inputs <- function(
 
     build_df_one <- function(inp, scenario_nm) {
       ages <- inp$ages
+
       out <- lapply(species, function(sp) {
         spdat <- inp$species[[sp]]
-        data.frame(
+
+        # Base long df (same as before)
+        df0 <- data.frame(
           scenario = scenario_nm,
           species  = sp,
           age      = ages,
@@ -567,14 +682,51 @@ plot_spr_inputs <- function(
           M        = spdat$M_at_age,
           stringsAsFactors = FALSE
         )
+
+        # Optional fleet selectivity df for overlay
+        df_fleet <- NULL
+        if (isTRUE(show_fleets) &&
+            !is.null(spdat$selex_fleets) &&
+            is.matrix(spdat$selex_fleets) &&
+            nrow(spdat$selex_fleets) == length(ages)) {
+
+          sf <- spdat$selex_fleets
+          coln <- colnames(sf)
+          if (is.null(coln)) coln <- paste0("fleet", seq_len(ncol(sf)))
+
+          df_fleet <- data.frame(
+            scenario = scenario_nm,
+            species  = sp,
+            age      = rep(ages, times = ncol(sf)),
+            fleet    = rep(coln, each = length(ages)),
+            selex    = as.numeric(sf),
+            stringsAsFactors = FALSE
+          )
+        }
+
+        attr(df0, "fleet_df") <- df_fleet
+        df0
       })
-      do.call(rbind, out)
+
+      df_main <- do.call(rbind, out)
+
+      # collect fleet dfs stored as attributes
+      fleet_list <- lapply(out, function(z) attr(z, "fleet_df"))
+      fleet_list <- fleet_list[!vapply(fleet_list, is.null, logical(1))]
+      df_fleets_all <- if (length(fleet_list) > 0) do.call(rbind, fleet_list) else NULL
+
+      attr(df_main, "fleet_df") <- df_fleets_all
+      df_main
     }
 
     if (facet_by_scenario) {
-      df <- do.call(rbind, Map(build_df_one, scenario_list, names(scenario_list)))
+      df_list <- Map(build_df_one, scenario_list, names(scenario_list))
+      df <- do.call(rbind, df_list)
+      df_fleets <- do.call(rbind, lapply(df_list, function(z) attr(z, "fleet_df")))
+      if (is.null(df_fleets) || (is.data.frame(df_fleets) && nrow(df_fleets) == 0)) df_fleets <- NULL
     } else {
       df <- build_df_one(x, scenario_nm = "single")
+      df_fleets <- attr(df, "fleet_df")
     }
 
     plots <- list()
@@ -636,6 +788,7 @@ plot_spr_inputs <- function(
     # ---- Panel 1: maturity + selectivity ----
     if ("mat_selex" %in% panels) {
       if (isTRUE(overlay_maturity_selex)) {
+
         df_long <- tidyr::pivot_longer(
           df,
           cols = c("maturity", "selex"),
@@ -644,6 +797,7 @@ plot_spr_inputs <- function(
         )
 
         if (isTRUE(single_species_mode)) {
+          # Base plot for maturity+sel
           p <- ggplot2::ggplot(
             df_long,
             ggplot2::aes(x = age, y = value, linetype = quantity, group = quantity)
@@ -652,10 +806,24 @@ plot_spr_inputs <- function(
             ggplot2::scale_linetype_manual(values = c(maturity = 1, selex = 3)) +
             ggplot2::labs(x = "Age", y = "Maturity or selectivity", linetype = NULL) +
             ggplot2::coord_cartesian(ylim = c(0, 1))
+
+          # Overlay fleet selectivity curves
+          if (isTRUE(show_fleets) && !is.null(df_fleets) && nrow(df_fleets) > 0) {
+            p <- p +
+              ggplot2::geom_line(
+                data = df_fleets,
+                ggplot2::aes(x = age, y = selex, group = fleet),
+                inherit.aes = FALSE,
+                linewidth = 0.6,
+                alpha = 0.35,
+                linetype = 1
+              )
+          }
+
           p <- facet_if_needed(p)
           plots$mat_selex <- p + theme_tier4()
+
         } else {
-          # collapse shared lines independently for maturity and selex
           df_long2 <- collapse_shared_long(df_long, shared_prefix = "Shared")
 
           p <- ggplot2::ggplot(
@@ -673,47 +841,43 @@ plot_spr_inputs <- function(
             ggplot2::coord_cartesian(ylim = c(0, 1)) +
             make_color_scale(df_long2, shared_prefix = "Shared")
 
+          # overlay fleet selectivity curves
+          if (isTRUE(show_fleets) && !is.null(df_fleets) && nrow(df_fleets) > 0) {
+            p <- p +
+              ggplot2::geom_line(
+                data = df_fleets,
+                ggplot2::aes(x = age, y = selex, color = species, group = interaction(species, fleet)),
+                inherit.aes = FALSE,
+                linewidth = 0.6,
+                alpha = 0.35,
+                linetype = 1
+              )
+          }
+
           p <- facet_if_needed(p)
           plots$mat_selex <- p + scale_color_tier4() + scale_fill_tier4() + theme_tier4()
         }
+
       } else {
-        # separate plots for maturity and selectivity
-        if (isTRUE(single_species_mode)) {
-          p_mat <- ggplot2::ggplot(df, ggplot2::aes(age, maturity)) +
-            ggplot2::geom_line(linewidth = 1) +
-            ggplot2::labs(x = "Age", y = "Maturity") +
-            ggplot2::coord_cartesian(ylim = c(0, 1))
+        df_m <- collapse_shared_wide(df, "maturity", "Shared maturity")
+        df_s <- collapse_shared_wide(df, "selex", "Shared selectivity")
 
-          p_sel <- ggplot2::ggplot(df, ggplot2::aes(age, selex)) +
-            ggplot2::geom_line(linewidth = 1) +
-            ggplot2::labs(x = "Age", y = "Selectivity") +
-            ggplot2::coord_cartesian(ylim = c(0, 1))
+        p_mat <- ggplot2::ggplot(df_m, ggplot2::aes(age, maturity, color = species)) +
+          ggplot2::geom_line(linewidth = 1) +
+          ggplot2::labs(x = "Age", y = "Maturity", color = "Species") +
+          ggplot2::coord_cartesian(ylim = c(0, 1)) +
+          make_color_scale(df_m, shared_prefix = "Shared")
 
-          p_mat <- facet_if_needed(p_mat)
-          p_sel <- facet_if_needed(p_sel)
-          plots$maturity <- p_mat + theme_tier4()
-          plots$selectivity <- p_sel + theme_tier4()
-        } else {
-          df_m <- collapse_shared_wide(df, "maturity", "Shared maturity")
-          df_s <- collapse_shared_wide(df, "selex", "Shared selectivity")
+        p_sel <- ggplot2::ggplot(df_s, ggplot2::aes(age, selex, color = species)) +
+          ggplot2::geom_line(linewidth = 1) +
+          ggplot2::labs(x = "Age", y = "Selectivity", color = "Species") +
+          ggplot2::coord_cartesian(ylim = c(0, 1)) +
+          make_color_scale(df_s, shared_prefix = "Shared")
 
-          p_mat <- ggplot2::ggplot(df_m, ggplot2::aes(age, maturity, color = species)) +
-            ggplot2::geom_line(linewidth = 1) +
-            ggplot2::labs(x = "Age", y = "Maturity", color = "Species") +
-            ggplot2::coord_cartesian(ylim = c(0, 1)) +
-            make_color_scale(df_m, shared_prefix = "Shared")
-
-          p_sel <- ggplot2::ggplot(df_s, ggplot2::aes(age, selex, color = species)) +
-            ggplot2::geom_line(linewidth = 1) +
-            ggplot2::labs(x = "Age", y = "Selectivity", color = "Species") +
-            ggplot2::coord_cartesian(ylim = c(0, 1)) +
-            make_color_scale(df_s, shared_prefix = "Shared")
-
-          p_mat <- facet_if_needed(p_mat)
-          p_sel <- facet_if_needed(p_sel)
-          plots$maturity <- p_mat + scale_color_tier4() + scale_fill_tier4() + theme_tier4()
-          plots$selectivity <- p_sel + scale_color_tier4() + scale_fill_tier4() + theme_tier4()
-        }
+        p_mat <- facet_if_needed(p_mat)
+        p_sel <- facet_if_needed(p_sel)
+        plots$maturity <- p_mat + scale_color_tier4() + scale_fill_tier4() + theme_tier4()
+        plots$selectivity <- p_sel + scale_color_tier4() + scale_fill_tier4() + theme_tier4()
       }
     }
 

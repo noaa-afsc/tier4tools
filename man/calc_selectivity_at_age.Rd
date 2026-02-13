@@ -11,7 +11,10 @@ calc_selectivity_at_age(ages, selectivity, scale_max = TRUE)
 
 \item{selectivity}{A named list specifying selectivity. Required element \code{type}.
 For \code{type="vector"}, provide \code{s}. For \code{type="knife_edge"}, provide \code{a_c}.
-For \code{type="logistic"}, provide \code{a50} and \code{delta}.}
+For \code{type="logistic"}, provide \code{a50} and \code{delta}.
+For \code{type="fleets"}, provide \code{fleets}, a named list of fleets. Each fleet must include
+\code{propF} (nonnegative, used as a weight on \eqn{F}) and \code{selex} (a selectivity specification of
+type \code{"vector"}, \code{"knife_edge"}, or \code{"logistic"}).}
 
 \item{scale_max}{Logical. If \code{TRUE}, scales selectivity so that \code{max(s_a) = 1} when possible.}
 }
@@ -29,6 +32,9 @@ Supported inputs:
 \item \code{type = "vector"}: external selectivity vector \code{s} with \code{length(s) == length(ages)}.
 \item \code{type = "knife_edge"}: step function with age-at-full-selection \code{a_c}.
 \item \code{type = "logistic"}: logistic curve with parameters \code{a50} and \code{delta}.
+\item \code{type = "fleets"}: multiple fisheries with fleet-specific selectivity curves and fishing mortality weights.
+Provide \code{fleets = list(<fleetname> = list(propF = <weight>, selex = <selectivity_spec>), ...)}.
+Fleet selectivities are collapsed into an effective selectivity-at-age vector using a \code{propF}-weighted mean.
 }
 
 Knife-edge form:
@@ -36,5 +42,9 @@ Knife-edge form:
 
 Logistic form:
 \deqn{s_a = \frac{1}{1 + \exp\left(\frac{a - a_{50}}{\delta}\right)}}
+
+Multi-fleet option:
+When \code{type="fleets"}, the function returns an effective selectivity-at-age vector
+\eqn{s^\*a = \sum_f \lambda_f s{f,a}}, where \eqn{\lambda_f} are the normalized \code{propF} weights.
 }
 \keyword{internal}
