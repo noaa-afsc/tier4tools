@@ -6,7 +6,7 @@ strips/legend.
 ## Usage
 
 ``` r
-theme_tier4()
+theme_tier4(base_size = 12)
 ```
 
 ## Value
