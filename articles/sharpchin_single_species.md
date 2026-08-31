@@ -150,7 +150,7 @@ spr_out <- run_spr(
 
 spr_out$F_spr_total
 #> F40_total F35_total 
-#>     0.066     0.080
+#>     0.065     0.080
 ```
 
 ## Plot SPR curves
@@ -232,33 +232,33 @@ sens <- spr_sensitivity(
 
 head(sens)
 #>   scenario_id    M maturity_a50 selex_ac prop F40_total F35_total
-#> 1           1   NA           NA       NA   NA     0.066     0.080
-#> 2           2 0.05           NA       NA   NA     0.058     0.070
-#> 3           3 0.06           NA       NA   NA     0.066     0.082
-#> 4           4 0.07           NA       NA   NA     0.078     0.094
-#> 5           5 0.08           NA       NA   NA     0.088     0.108
-#> 6           6 0.09           NA       NA   NA     0.100     0.122
+#> 1           1   NA           NA       NA   NA     0.064     0.080
+#> 2           2 0.05           NA       NA   NA     0.056     0.068
+#> 3           3 0.06           NA       NA   NA     0.066     0.080
+#> 4           4 0.07           NA       NA   NA     0.076     0.094
+#> 5           5 0.08           NA       NA   NA     0.088     0.106
+#> 6           6 0.09           NA       NA   NA     0.098     0.120
 #>   F40_total_constrained F35_total_constrained YPR_at_F40
-#> 1                    NA                    NA 0.11651216
-#> 2                    NA                    NA 0.13460304
+#> 1                    NA                    NA 0.11529859
+#> 2                    NA                    NA 0.13303658
 #> 3                    NA                    NA 0.11420131
-#> 4                    NA                    NA 0.09968137
+#> 4                    NA                    NA 0.09880926
 #> 5                    NA                    NA 0.08669596
-#> 6                    NA                    NA 0.07630796
+#> 6                    NA                    NA 0.07578750
 #>   plus_share_Sharpchin_F0 plus_share_Sharpchin_Ftarget F40_Sharpchin
-#> 1                      NA                           NA         0.066
-#> 2                      NA                           NA         0.058
+#> 1                      NA                           NA         0.064
+#> 2                      NA                           NA         0.056
 #> 3                      NA                           NA         0.066
-#> 4                      NA                           NA         0.078
+#> 4                      NA                           NA         0.076
 #> 5                      NA                           NA         0.088
-#> 6                      NA                           NA         0.100
+#> 6                      NA                           NA         0.098
 #>   F35_Sharpchin YPR40_Sharpchin share40_Sharpchin YPR40_total
-#> 1         0.080      0.11651216                 1  0.11651216
-#> 2         0.070      0.13460304                 1  0.13460304
-#> 3         0.082      0.11420131                 1  0.11420131
-#> 4         0.094      0.09968137                 1  0.09968137
-#> 5         0.108      0.08669596                 1  0.08669596
-#> 6         0.122      0.07630796                 1  0.07630796
+#> 1         0.080      0.11529859                 1  0.11529859
+#> 2         0.068      0.13303658                 1  0.13303658
+#> 3         0.080      0.11420131                 1  0.11420131
+#> 4         0.094      0.09880926                 1  0.09880926
+#> 5         0.106      0.08669596                 1  0.08669596
+#> 6         0.120      0.07578750                 1  0.07578750
 #>   YPR40_Sharpchin_constrained share40_Sharpchin_constrained
 #> 1                          NA                            NA
 #> 2                          NA                            NA
@@ -268,11 +268,11 @@ head(sens)
 #> 6                          NA                            NA
 #>   YPR40_total_constrained YPR35_Sharpchin share35_Sharpchin YPR35_total
 #> 1                      NA      0.12353530                 1  0.12353530
-#> 2                      NA      0.14233674                 1  0.14233674
-#> 3                      NA      0.12202936                 1  0.12202936
+#> 2                      NA      0.14122193                 1  0.14122193
+#> 3                      NA      0.12120435                 1  0.12120435
 #> 4                      NA      0.10551203                 1  0.10551203
-#> 5                      NA      0.09230489                 1  0.09230489
-#> 6                      NA      0.08108499                 1  0.08108499
+#> 5                      NA      0.09182725                 1  0.09182725
+#> 6                      NA      0.08071330                 1  0.08071330
 #>   YPR35_Sharpchin_constrained share35_Sharpchin_constrained
 #> 1                          NA                            NA
 #> 2                          NA                            NA

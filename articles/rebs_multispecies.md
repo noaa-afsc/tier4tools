@@ -234,7 +234,7 @@ spr_con <- run_spr(
 
 spr_uncon$F_spr_total
 #> F40_total F35_total 
-#>     0.048     0.059
+#>     0.048     0.058
 spr_con$F_spr_total_constrained
 #> F40_total_constrained F35_total_constrained 
 #>                 0.031                 0.036
