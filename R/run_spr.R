@@ -138,9 +138,17 @@ run_spr <- function(
     stop("spr_targets must be numeric values in (0,1), e.g., c(0.40, 0.35).")
   }
 
-  # solve for Fx such that SPR(Fx) = x over a defined F grid
+  # Find the largest F on the evaluated grid for which SPR remains
+  # at or above the target.
   find_F_at_target <- function(SPR, target) {
-    F_vec[which.min(abs(SPR - target))]
+    ok <- SPR >= target
+
+    if (!any(ok)) {
+      return(NA_real_)
+    }
+
+    max(F_vec[ok])
+
   }
 
   # get per recruit results for one species
